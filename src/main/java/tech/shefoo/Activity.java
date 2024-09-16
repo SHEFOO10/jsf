@@ -4,16 +4,10 @@ package tech.shefoo;
 import java.util.Map;
 
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
-
-
 
 public class Activity implements Cloneable {
     private int id;
     
-    @NotEmpty(message = "Activity name cannot be empty")
-    @Size(min = 8, max = 20, message = "Activity name must be between 8 and 20 characters")
     private String name;
 
     private String description;
