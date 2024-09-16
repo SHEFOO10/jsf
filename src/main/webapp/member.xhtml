@@ -6,7 +6,10 @@
 <h:head>
     <title>Member Activities</title>
     <style>
-    
+    	html, body, ol {
+    		padding: 0;
+    		margin: 0;
+    	}
     
          table {
         	border-radius: 10px;
@@ -93,13 +96,68 @@
    		
    		#flexContainer {
    			display: flex;
+   			flex-wrap: wrap;
    			gap: 10px;
    		}
+
+   		nav {
+   			width: 100%;
+   			height: 60px;
+   			background-color: #fafafa;
+   			display: flex;
+   			flex-wrap: nowrap;
+   			align-items: center;
+   			justify-content: center;
+   		}
+   		
+		ol {
+			width: 400px;
+   			text-align: center;
+   		}
+   		
+
+   		li {
+   			display: inline;
+   			margin-inline: 5%;
+   		}
+
+		li a {
+			cursor: click;
+			font-weight: bold;
+			color: black;
+			text-decoration: none;
+		}
+		
+		li a:hover {
+			color: red;
+		}
+
+		
+		#j_idt13\:memberId {
+			margin-inline: 10px;
+			border-radius: 5px;
+		}
+		
+		.flexItem {
+			flex-basis: 49%;
+			flex-grow: 1;
+			flex-shrink: 0;
+		}
+		
+		.flexItem:first-child {
+			flex-basis: 100%;
+		}
 		
     </style>
 </h:head>
 <h:body>
-
+<nav>
+	<ol>
+		<li><a href="member.xhtml">Join Activity</a></li>
+		<li><a href="members.xhtml">Members</a></li>
+		<li><a href="activities.xhtml">Activities</a></li>
+	</ol>
+</nav>
 <h:form id="errorForm">
     <h:panelGroup id="popup" rendered="#{activityBean.showErrorPopup}">
         <h:panelGroup layout="block" styleClass="popup-container">
@@ -123,15 +181,48 @@
 
 
     <h:form>
-        <div>
+        <div style="text-align: center; margin-block: 20px">
             <h:outputLabel for="memberId" value="Member ID:" />
             <h:inputText id="memberId" value="#{activityBean.memberId}" />
 
             <h:commandButton value="Search" action="#{activityBean.searchActivities}" />
         </div>
-
+        
+        
+        <h:panelGroup rendered="#{empty activityBean.member and !activityBean.firstEntrance}" style="text-align: center;">
+			<h1 style="text-align: center;">No Member found</h1>
+        </h:panelGroup>
 		<div id="flexContainer">
+		
+			<div class="flexItem">
+				<h:panelGroup rendered="${not empty activityBean.member}" style="display:flex; flex-wrap: wrap; padding-inline: 30%; height: 150px; justify-content: space-evenly">
+					<div>
+						<h:outputLabel>Member 	Name: </h:outputLabel>
+						<h:outputText value="#{activityBean.member.name}" />
+					</div>
+					<div>
+					<h:outputLabel>email: </h:outputLabel>
+					<h:outputText value="#{activityBean.member.email}" />
+					</div>
+										<div>
+					<h:outputLabel>National id: </h:outputLabel>
+					<h:outputText value="#{activityBean.member.national_id}" />
+					</div>
+										<div>
+					<h:outputLabel>Phone: </h:outputLabel>
+					<h:outputText value="#{activityBean.member.phone}" />
+					</div>
+					<div>
+					<h:outputLabel>Date Of Birth: </h:outputLabel>
+					<h:outputText value="#{activityBean.member.date_of_birth}" />
+					</div>
+					
+				</h:panelGroup>
+			
+			</div>
 	        <h:panelGroup rendered="#{not empty activityBean.availableActivities}">
+	        	<div class="flexItem">
+	        	<h:outputText value="Available Activities" style="font-weight: bold;" />
 	            <h:dataTable value="#{activityBean.availableActivities}" var="activity">
 	                <h:column>
 	                    <f:facet name="header">id</f:facet>
@@ -151,8 +242,10 @@
 	
 	                </h:column>
 	            </h:dataTable>
+	        	</div>
 	        </h:panelGroup>
 	        <h:panelGroup rendered="#{not empty activityBean.joinedActivities}">
+	        	<div class="flexItem">
 	        	<h:outputText value="Joined Activities" style="font-weight: bold;" />
 	            <h:dataTable value="#{activityBean.joinedActivities}" var="activity">
         	        <h:column>
@@ -173,6 +266,7 @@
 	
 	                </h:column>
 	            </h:dataTable>
+	        	</div>
 	        </h:panelGroup>
 		</div>
 

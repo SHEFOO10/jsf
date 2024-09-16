@@ -11,10 +11,20 @@ import java.util.List;
 @ManagedBean
 @ViewScoped
 public class ActivityBean {
+	public Member getMember() {
+		return member;
+	}
+
+	public void setMember(Member member) {
+		this.member = member;
+	}
+
+
 	private List<Activity> activities;
 	private List<Activity> availableActivities;
 	private List<Activity> joinedActivities;
 	private ActivityDAO activityDAO = new ActivityDAO();
+    private MemberDAO memberDAO = new MemberDAO();
     private Activity newActivity = new Activity();
     private Activity selectedActivity;
 
@@ -22,6 +32,8 @@ public class ActivityBean {
     private String errorMessage;
 
     private int memberId;
+    private Member member;
+    private boolean firstEntrance = true;
     
     
     public void updateAvailableList() {
@@ -45,8 +57,15 @@ public class ActivityBean {
     }
     
     public void searchActivities() {
+    	setFirstEntrance(false);
     	updateAvailableList();
     	updateJoinedList();
+    	try {
+			member = memberDAO.getMemberById(memberId);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
     
     public List<Activity> getJoinedActivities() {
@@ -224,4 +243,14 @@ public class ActivityBean {
 	public void setErrorMessage(String errorMessage) {
 		this.errorMessage = errorMessage;
 	}
+
+	public boolean isFirstEntrance() {
+		return firstEntrance;
+	}
+
+	public void setFirstEntrance(boolean firstEntrance) {
+		this.firstEntrance = firstEntrance;
+	}
+
+
 }
