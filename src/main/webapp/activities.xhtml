@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">  
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <title>Members Management</title>
+    <style>
+ 		table {
+        	border-radius: 10px;
+            width: 100%;
+            border-collapse: collapse; /* Remove space between table cells */
+            height: 700px;
+            overflow-y: scroll;
+        }
+
+        th, td {
+            padding: 12px; /* Adds padding inside cells */
+            border: 1px solid #ddd; /* Adds border to each cell */
+            text-align: center; /* Aligns text to the center */
+        }
+
+        th {
+            background-color: #f2f2f2; /* Adds background color to table headers */
+            font-weight: bold; /* Makes header text bold */
+            position: sticky;
+            top: -1px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9; /* Zebra striping: changes background of even rows */
+        }
+
+        tr:hover {
+            background-color: #e9e9e9; /* Hover effect for rows */
+        }
+
+        caption {
+            font-size: 1.5em; /* Styles caption (title) of table */
+            margin: 10px 0;
+        }
+        
+
+        #formContainer {
+            width: max-content;
+            gap: 10px;
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto;
+        }
+    </style>
+</h:head>
+<h:body>
+    <h:form id="activityForm">
+        <!-- Form for creating/editing a activity -->
+        <h3>#{activityBean.newActivity.id == null ? 'Create New Activity' : 'Edit Activity'}</h3>
+        <div id="formContainer">
+	        <h:outputLabel for="name" value="Name:" />
+	        <h:inputText id="name" value="#{activityBean.newActivity.name}"/>
+	        <h:message for="name" style="color:red;" />
+
+            <h:outputLabel for="description" value="Description:" />
+            <h:inputText id="description" value="#{activityBean.newActivity.description}"  />
+
+            <h:outputLabel for="min_age" value="Min Age:" />
+            <h:inputText id="min_age" value="#{activityBean.newActivity.min_age}"  />
+
+            <h:outputLabel for="max_age" value="Max Age:" />
+            <h:inputText id="max_age" value="#{activityBean.newActivity.max_age}"  />
+
+        </div>        
+
+        <h:commandButton value="Save" action="#{activityBean.addActivity}" />
+		<h:commandButton value="Reset" action="#{activityBean.resetInputs}"/>
+
+        <!-- List of activitys -->
+        <h:panelGroup>
+            <h3>Activities List</h3>
+            <h:dataTable value="#{activityBean.activities}" var="activity">
+                <h:column>
+                    <f:facet name="header">ID</f:facet>
+                    <h:outputText value="#{activity.id}" />
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Name</f:facet>
+                    <h:outputText value="#{activity.name}" />
+                </h:column>
+                <h:column>
+                    <f:facet name="header">description</f:facet>
+                    <h:outputText value="#{activity.description}" />
+                </h:column>
+                <h:column>
+                    <f:facet name="header">min_age</f:facet>
+                    <h:outputText value="#{activity.min_age}" />
+                </h:column>
+                <h:column>
+                    <f:facet name="header">max_age</f:facet>
+                    <h:outputText value="#{activity.max_age}" />
+                </h:column>
+                <h:column>
+                    <!-- Edit Member Button -->
+                    <h:commandButton value="Edit" action="#{activityBean.editActivity(activity.id)}"/>
+
+                    <!-- Delete Member Button -->
+                    <h:commandButton value="Delete" action="#{activityBean.deleteActivity(activity.id)}" immediate="true" />
+                </h:column>
+            </h:dataTable>
+        </h:panelGroup>
+    </h:form>
+</h:body>
+</html>
