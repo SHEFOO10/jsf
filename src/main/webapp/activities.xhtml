@@ -42,9 +42,9 @@
 
         #formContainer {
             width: max-content;
-            gap: 10px;
+            gap: 20px;
             display: grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: 1fr 1fr;
             grid-template-rows: auto;
         }
 
@@ -79,6 +79,13 @@
 		li a:hover {
 			color: red;
 		}
+		
+        #tableWrapper {
+        	margin-inline: 100px;
+        	max-height: 500px;
+        	overflow-y: auto;
+        }
+	
     </style>
 </h:head>
 <h:body>
@@ -90,30 +97,10 @@
         </ol>
     </nav>
     <h:form id="activityForm">
-        <!-- Form for creating/editing a activity -->
-        <h3>#{activityBean.newActivity.id == null ? 'Create New Activity' : 'Edit Activity'}</h3>
-        <div id="formContainer">
-	        <h:outputLabel for="name" value="Name:" />
-	        <h:inputText id="name" value="#{activityBean.newActivity.name}"/>
-	        <h:message for="name" style="color:red;" />
-
-            <h:outputLabel for="description" value="Description:" />
-            <h:inputText id="description" value="#{activityBean.newActivity.description}"  />
-
-            <h:outputLabel for="min_age" value="Min Age:" />
-            <h:inputText id="min_age" value="#{activityBean.newActivity.min_age}"  />
-
-            <h:outputLabel for="max_age" value="Max Age:" />
-            <h:inputText id="max_age" value="#{activityBean.newActivity.max_age}"  />
-
-        </div>        
-
-        <h:commandButton value="Save" action="#{activityBean.addActivity}" />
-		<h:commandButton value="Reset" action="#{activityBean.resetInputs}"/>
-
-        <!-- List of activitys -->
-        <h:panelGroup>
-            <h3>Activities List</h3>
+            <!-- List of activitys -->
+           <h:panelGroup>
+            <h3 style="text-align: center;">Activities List</h3>
+            <div id="tableWrapper">
             <h:dataTable value="#{activityBean.activities}" var="activity">
                 <h:column>
                     <f:facet name="header">ID</f:facet>
@@ -143,7 +130,48 @@
                     <h:commandButton value="Delete" action="#{activityBean.deleteActivity(activity.id)}" immediate="true" />
                 </h:column>
             </h:dataTable>
+            </div>
         </h:panelGroup>
+        <!-- Form for creating/editing a activity -->
+       
+       	<div style="width: 100%; text-align: center;">
+       		<h3>#{activityBean.newActivity.id == null ? 'Create New Activity' : 'Edit Activity'}</h3>
+       	</div>
+        <div style="width: 100%; display: flex; justify-content: center; margin-block: 20px;">
+        	<div id="formContainer">
+	        	<div>
+			        <h:outputLabel for="name" value="Name:" />
+			        <p><h:inputText id="name" value="#{activityBean.newActivity.name}"/></p>
+			        <h:message for="name" style="color:red;" />
+	        	</div>
+	
+				<div>
+		            <h:outputLabel for="description" value="Description:" />
+		            <p><h:inputText id="description" value="#{activityBean.newActivity.description}"  /></p>
+		            <h:message for="description" style="color: red" />
+				</div>
+				<div>
+		            <h:outputLabel for="min_age" value="Min Age:" />
+		            <p><h:inputText id="min_age" value="#{activityBean.newActivity.min_age}"  /></p>
+		            <h:message for="min_age" style ="color: red;"/>
+				</div>
+	
+				<div>
+		            <h:outputLabel for="max_age" value="Max Age:" />
+		            <p><h:inputText id="max_age" value="#{activityBean.newActivity.max_age}"  /></p>
+					<h:message for="max_age" style="color: red;" />
+				</div>
+	
+				<div style="width: 100%; grid-column: 2 span; display: flex; justify-content: space-evenly">
+			        <h:commandButton value="Save" action="#{activityBean.addActivity}" />
+					<h:commandButton value="Reset" action="#{activityBean.resetInputs}"/>
+				</div>
+        	</div>
+        </div>        
+
+
+
+ 
     </h:form>
 </h:body>
 </html>

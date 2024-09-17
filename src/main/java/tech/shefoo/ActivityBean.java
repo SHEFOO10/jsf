@@ -1,12 +1,14 @@
 package tech.shefoo;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-
+import javax.faces.context.FacesContext;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
 
 @ManagedBean
 @ViewScoped
@@ -103,6 +105,9 @@ public class ActivityBean {
     }
 
     public void addActivity() {
+		FacesContext context = validate();
+		if (context.getMessageList().size() > 0)
+			return;
         try {
         	if (newActivity.getId() == 0) {
         		activityDAO.addActivity(newActivity);
@@ -252,5 +257,29 @@ public class ActivityBean {
 		this.firstEntrance = firstEntrance;
 	}
 
+
+public FacesContext validate() {
+        FacesContext context = FacesContext.getCurrentInstance();
+    
+        if (newActivity.getName() == null || newActivity.getName().isEmpty()) {
+            context.addMessage("activityForm:name", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Validation Error", "Name is required."));
+        }
+    
+        if (newActivity.getDescription() == null || newActivity.getDescription().isEmpty()) {
+            context.addMessage("activityForm:description", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Validation Error", "Description is required."));
+        }
+    
+        if (newActivity.getMin_age() == null) {
+            context.addMessage("activityForm:min_age", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Validation Error", "min age is required."));
+        }
+    
+        if (newActivity.getMin_age() != null)
+        	System.out.println(newActivity.getMin_age().getClass());
+        	
+        if (newActivity.getMax_age() == null) {
+            context.addMessage("activityForm:max_age", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Validation Error", "max age is required."));
+        }
+		return context;
+    }
 
 }
