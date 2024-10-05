@@ -1,4 +1,4 @@
-package tech.shefoo;
+package tech.shefoo.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -7,6 +7,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.zaxxer.hikari.HikariDataSource;
+
+import tech.shefoo.Activity;
+import tech.shefoo.DatabaseConfig;
+import tech.shefoo.Member;
+
 import java.time.LocalDate;
 import java.time.Period;
 
@@ -14,7 +21,7 @@ import java.time.Period;
 public class ActivityDAO {
 
     private MemberDAO memberDAO = new MemberDAO();
-
+    private HikariDataSource databaseInstance = DatabaseConfig.getDataSource();
     
     
     public static int calculateMemberAge(LocalDate birthDate) {
@@ -34,13 +41,13 @@ public class ActivityDAO {
     
     
     public void joinActivity(int activity_id, int member_id) throws SQLException {
-    	String query = "INSERT INTO member_activities (activity_id, member_id) values (?, ?)";
+    	String query = "CALL AddMemberActivity(?, ?)";
 
     	
-	     try (Connection connection = DatabaseConfig.getDataSource().getConnection();
+	     try (Connection connection = databaseInstance.getConnection();
 	          PreparedStatement statement = connection.prepareStatement(query)) {
-	         statement.setInt(1, activity_id);
-	         statement.setInt(2, member_id);
+	    	 statement.setInt(1, member_id);
+	         statement.setInt(2, activity_id);
 	         statement.executeUpdate();
 	     }
     }
@@ -48,7 +55,7 @@ public class ActivityDAO {
     
     public void leaveActivity(int activity_id, int member_id) throws SQLException {
     	String query = "DELETE FROM member_activities WHERE activity_id = ? AND  member_id = ?";
-	     try (Connection connection = DatabaseConfig.getDataSource().getConnection();
+	     try (Connection connection = databaseInstance.getConnection();
 	          PreparedStatement statement = connection.prepareStatement(query)) {
 	         statement.setInt(1, activity_id);
 	         statement.setInt(2, member_id);
@@ -59,8 +66,8 @@ public class ActivityDAO {
     
     public List<Activity> getAllActivites() throws SQLException {
         List<Activity> activities = new ArrayList<>();
-        String query = "SELECT * FROM activities";
-        try (Connection connection = DatabaseConfig.getDataSource().getConnection();
+        String query = "CALL GetAllActivities();";
+        try (Connection connection = databaseInstance.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
@@ -93,7 +100,7 @@ public class ActivityDAO {
         
         
         String query = "SELECT * FROM activities WHERE (min_age <= ? AND max_age >= ?) AND id NOT IN (select activity_id from member_activities where member_id = ?)";
-        try (Connection connection = DatabaseConfig.getDataSource().getConnection();
+        try (Connection connection = databaseInstance.getConnection();
     		PreparedStatement statement = connection.prepareStatement(query)
 			) {
         	
@@ -125,7 +132,7 @@ public class ActivityDAO {
         
         
         String query = "SELECT * FROM activities WHERE id in (select activity_id from member_activities where member_id = ?)";
-        try (Connection connection = DatabaseConfig.getDataSource().getConnection();
+        try (Connection connection = databaseInstance.getConnection();
     		 PreparedStatement statement = connection.prepareStatement(query);
         ) {
         	
@@ -148,8 +155,8 @@ public class ActivityDAO {
     
     
     public void addActivity(Activity activity) throws SQLException {
-        String query = "INSERT INTO activities (name, description, min_age, max_age) VALUES (?, ?, ?, ?)";
-        try (Connection connection = DatabaseConfig.getDataSource().getConnection();
+        String query = "CALL AddActivity(?, ?, ?, ?)";
+        try (Connection connection = databaseInstance.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, activity.getName());
             statement.setString(2, activity.getDescription());
@@ -201,7 +208,7 @@ public class ActivityDAO {
             parameters.add(updatedActivity.getId()); // Assuming you have an ID to update
 
             // Execute the query using PreparedStatement
-            try (Connection connection = DatabaseConfig.getDataSource().getConnection(); // Replace with your actual connection method
+            try (Connection connection = databaseInstance.getConnection(); // Replace with your actual connection method
                  PreparedStatement pstmt = connection.prepareStatement(sql.toString())) {
 
                 // Set parameters
@@ -222,7 +229,7 @@ public class ActivityDAO {
     public Activity getActivityById(int activityId) throws SQLException {
         Activity activity = null;
         String query = "SELECT * FROM activities WHERE id = ?";
-        try (Connection connection = DatabaseConfig.getDataSource().getConnection();
+        try (Connection connection = databaseInstance.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, activityId);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -241,8 +248,8 @@ public class ActivityDAO {
     }
 
     public void deleteActivity(int activityId) throws SQLException {
-        String query = "DELETE FROM activities WHERE id = ?";
-        try (Connection connection = DatabaseConfig.getDataSource().getConnection();
+        String query = "CALL DeleteActivity(?);";
+        try (Connection connection = databaseInstance.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, activityId);
             statement.executeUpdate();

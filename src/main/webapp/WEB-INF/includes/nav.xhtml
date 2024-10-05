@@ -1,0 +1,14 @@
+<!-- /WEB-INF/includes/navbar.xhtml -->
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <nav>
+        <ol>
+            <li><a href="joinactivity.xhtml" class="#{navigationBean.getCurrentURI().contains('joinactivity') ? 'active': ''}">Join Activity</a></li>
+            <li><a href="members.xhtml" class="#{navigationBean.getCurrentURI().contains('members') ? 'active': ''}">Members</a></li>
+            <li><a href="activities.xhtml" class="#{navigationBean.getCurrentURI().contains('activities') ? 'active': ''}">Activities</a></li>
+			<li><a href="skills.xhtml" class="#{navigationBean.getCurrentURI().contains('skills') ? 'active': ''}">Skills</a></li>
+        </ol>
+    </nav>
+</ui:composition>

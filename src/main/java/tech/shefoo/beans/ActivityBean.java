@@ -1,10 +1,16 @@
-package tech.shefoo;
+package tech.shefoo.beans;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import tech.shefoo.Activity;
+import tech.shefoo.Member;
+import tech.shefoo.dao.ActivityDAO;
+import tech.shefoo.dao.MemberDAO;
+
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +18,13 @@ import java.util.List;
 
 @ManagedBean
 @ViewScoped
-public class ActivityBean {
+public class ActivityBean implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2190259305252625791L;
+
+
 	public Member getMember() {
 		return member;
 	}
@@ -121,6 +133,10 @@ public class ActivityBean {
             // Handle exception
         }
     }
+    
+    public void updateMinAge() {
+    	System.out.println(newActivity.getMin_age());
+    }
 
     public void editActivity(Integer id) {
         // Find the member by ID and populate `newActivity` for editing
@@ -139,9 +155,9 @@ public class ActivityBean {
     }
    
 
-    public void deleteActivity(int memberId) {
+    public void deleteActivity(int activity_id) {
         try {
-        	activityDAO.deleteActivity(memberId);
+        	activityDAO.deleteActivity(activity_id);
             loadActivitys(); // Refresh the list
         } catch (SQLException e) {
             e.printStackTrace();

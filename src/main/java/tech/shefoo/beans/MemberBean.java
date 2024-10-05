@@ -1,12 +1,25 @@
-package tech.shefoo;
+package tech.shefoo.beans;
 
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.servlet.ServletContext;
 
+import org.primefaces.model.file.UploadedFile;
+
+import tech.shefoo.Member;
+import tech.shefoo.dao.MemberDAO;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 
 
@@ -19,6 +32,71 @@ public class MemberBean {
     private Member newMember = new Member();
     private Member selectedMember;
 
+    private String uploadPath;
+	private UploadedFile file;
+	
+    private String generateRandomFilename(String originalFileName) {
+    	if (originalFileName == null) return null;
+        String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+        String randomUUID = UUID.randomUUID().toString();
+        return randomUUID + fileExtension; // Append the original file extension
+    }
+    
+    
+    
+    
+    @PostConstruct
+    public void init() {
+        // Get the FacesContext and then the ServletContext
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        ServletContext servletContext = (ServletContext) facesContext.getExternalContext().getContext();
+        
+        // Get the real path for the uploads directory
+        uploadPath = servletContext.getRealPath("/resources/uploads");
+        
+        // Create the uploads directory if it doesn't exist
+        try {
+            Path path = Paths.get(uploadPath);
+            if (!Files.exists(path)) {
+                Files.createDirectories(path); // Create the uploads directory here
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public UploadedFile getFile() {
+		return file;
+	}
+
+
+	public void setFile(UploadedFile file) {
+		this.file = file;
+	}
+
+
+	public String uploadProfileImg(UploadedFile file) {
+		String randomImgName = null;
+        if (file != null) {
+            try (InputStream input = file.getInputStream()) {
+                // Save the uploaded file to the uploads directory
+            	randomImgName = generateRandomFilename(file.getFileName());
+            	if (randomImgName == null) return "placeholder.jpg";
+                Path filePath = Paths.get(uploadPath, randomImgName);
+                Files.copy(input, filePath);
+                System.out.println("File successfully uploaded: " + filePath);
+                return randomImgName;
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+            	setFile(null);
+            }
+        } else {
+            System.out.println("No file selected!");
+        }
+        return "placeholder.jpg";
+    }
+    
     public void loadMembers() {
         try {
             members = memberDAO.getAllMembers();
@@ -46,11 +124,15 @@ public class MemberBean {
      public void addMember() {
         validate();
         if (FacesContext.getCurrentInstance().getMessageList().isEmpty()) {
-            try {
+
+        	String image_path = uploadProfileImg(file);
+        	
+            newMember.setProfileImg(image_path);
+        	try {
                 if (newMember.getId() == 0) {
                     memberDAO.addMember(newMember);
                 } else {
-                    memberDAO.updateMember(selectedMember, newMember);
+                    memberDAO.updateMember(newMember);
                 }
                 newMember = new Member(); // Reset the form
                 loadMembers(); // Refresh the list

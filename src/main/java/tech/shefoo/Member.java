@@ -12,7 +12,17 @@ public class Member implements Cloneable {
     private String email;
     private String date_of_birth;
     private String address;
-    private boolean isNewRecord = true;
+    private String profileImg;
+    
+    public String getProfileImg() {
+		return profileImg;
+	}
+
+	public void setProfileImg(String profileImg) {
+		this.profileImg = profileImg;
+	}
+
+	private boolean isNewRecord = true;
     
 	private Map<String, String> props;
     

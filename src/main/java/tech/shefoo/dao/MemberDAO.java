@@ -1,4 +1,4 @@
-package tech.shefoo;
+package tech.shefoo.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,17 +8,21 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import tech.shefoo.DatabaseConfig;
+import tech.shefoo.Member;
+
 public class MemberDAO {
 
     public List<Member> getAllMembers() throws SQLException {
         List<Member> members = new ArrayList<>();
-        String query = "SELECT * FROM members";
+        String query = "CALL GetAllMembers();";
         try (Connection connection = DatabaseConfig.getDataSource().getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
                 Member member = new Member();
                 member.setId(resultSet.getInt("id"));
+                member.setProfileImg("/uploads/" + resultSet.getString("image_path"));
                 member.setName(resultSet.getString("name"));
                 member.setNational_id(resultSet.getString("national_id"));
                 member.setPhone(resultSet.getString("phone"));
@@ -33,7 +37,7 @@ public class MemberDAO {
     }
 
     public void addMember(Member member) throws SQLException {
-        String query = "INSERT INTO members (name, national_id, phone, email, date_of_birth, address) VALUES (?, ?, ?, ?, ?, ?)";
+        String query = "CALL AddMember(?, ?, ?, ?, ?, ?, ?);";
         try (Connection connection = DatabaseConfig.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, member.getName());
@@ -42,77 +46,43 @@ public class MemberDAO {
             statement.setString(4, member.getEmail());
             statement.setString(5, member.getDate_of_birth());
             statement.setString(6, member.getAddress());
+            statement.setString(7, member.getProfileImg());
             statement.executeUpdate();
         }
     }
 
-    
-    public void updateMember(Member member, Member updatedMember) {
-        if (member == null) {
-            throw new IllegalArgumentException("Member or Member ID cannot be null");
-        }
-
-        StringBuilder sql = new StringBuilder("UPDATE members SET ");
-        List<Object> parameters = new ArrayList<>();
-        boolean hasChanges = false;
-
-        // Compare and append fields to the SQL query
-        if (!member.getName().equals(updatedMember.getName())) {
-            sql.append("name = ?, ");
-            parameters.add(updatedMember.getName());
-            hasChanges = true;
-        }
-        if (!member.getNational_id().equals(updatedMember.getNational_id())) {
-            sql.append("national_id = ?, ");
-            parameters.add(updatedMember.getNational_id());
-            hasChanges = true;
-        }
-        if (!member.getPhone().equals(updatedMember.getPhone())) {
-            sql.append("phone = ?, ");
-            parameters.add(updatedMember.getPhone());
-            hasChanges = true;
-        }
-        if (!member.getEmail().equals(updatedMember.getEmail())) {
-            sql.append("email = ?, ");
-            parameters.add(updatedMember.getEmail());
-            hasChanges = true;
-        }
-        if (!member.getDate_of_birth().equals(updatedMember.getDate_of_birth())) {
-            sql.append("date_of_birth = ?, ");
-            parameters.add(updatedMember.getDate_of_birth());
-            hasChanges = true;
-        }
-        if (!member.getAddress().equals(updatedMember.getAddress())) {
-            sql.append("address = ?, ");
-            parameters.add(updatedMember.getAddress());
-            hasChanges = true;
-        }
-
-        // Ensure there are fields to update
-        if (hasChanges) {
-            // Remove the trailing comma and space
-            sql.setLength(sql.length() - 2);
-
-            // Append the WHERE clause
-            sql.append(" WHERE id = ?");
-            parameters.add(updatedMember.getId()); // Assuming you have an ID to update
-
-            // Execute the query using PreparedStatement
-            try (Connection connection = DatabaseConfig.getDataSource().getConnection(); // Replace with your actual connection method
-                 PreparedStatement pstmt = connection.prepareStatement(sql.toString())) {
-
-                // Set parameters
-                for (int i = 0; i < parameters.size(); i++) {
-                    pstmt.setObject(i + 1, parameters.get(i));
-                }
-
-                int rowsAffected = pstmt.executeUpdate();
-                System.out.println("Rows affected: " + rowsAffected);
-            } catch (SQLException e) {
-                e.printStackTrace();
+    public int membersCount() {
+    	String query = "select count(*) from members";
+    	int count = 0;
+    	try (Connection connection = DatabaseConfig.getDataSource().getConnection();
+    			PreparedStatement statement = connection.prepareStatement(query);
+			    ResultSet resultSet = statement.executeQuery()) {
+    		if (resultSet.next()) {
+                count = resultSet.getInt(1);  // Get the first column from the result set
             }
-        } else {
-            System.out.println("No changes detected, no update performed.");
+    	} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+    	return count;
+    }
+    
+    public void updateMember(Member updatedMember) {
+        String query = "CALL UpdateMember(?, ?, ?, ?, ?, ?, ?, ?);";
+        try (Connection connection = DatabaseConfig.getDataSource().getConnection();
+                PreparedStatement statement = connection.prepareStatement(query)) {
+        	   statement.setInt(1, updatedMember.getId());
+               statement.setString(2, updatedMember.getName());
+               statement.setString(3, updatedMember.getNational_id());
+               statement.setString(4, updatedMember.getPhone());
+               statement.setString(5, updatedMember.getEmail());
+               statement.setString(6, updatedMember.getDate_of_birth());
+               statement.setString(7, updatedMember.getAddress());
+               System.out.println(updatedMember.getProfileImg());
+               statement.setString(8, updatedMember.getProfileImg());
+               statement.executeUpdate();
+       } catch (SQLException e) {
+                e.printStackTrace();
         }
     }
 
@@ -139,7 +109,7 @@ public class MemberDAO {
     }
 
     public void deleteMember(int memberId) throws SQLException {
-        String query = "DELETE FROM members WHERE id = ?";
+        String query = "CALL DeleteMember(?);";
         try (Connection connection = DatabaseConfig.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, memberId);
