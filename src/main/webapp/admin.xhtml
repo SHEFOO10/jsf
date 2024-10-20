@@ -7,11 +7,27 @@
 	<title>Facelet Title</title>
 </h:head>
 <h:body>
-	<ui:include src="WEB-INF/includes/nav.xhtml" />
-	<h:form>
-		<p>Number of members: <h:outputText value="#{login.membersCount}" /></p>
-		<p>Welcome #{login.user}</p>
-		<h:commandLink action="#{login.logout}" value="Logout"></h:commandLink>
-	</h:form>
+	<ui:composition template="/WEB-INF/includes/layouts/layout.xhtml">
+		<ui:define name="content">
+			<h:form>
+			<div style="padding: 20px;">
+				<h2 style="margin-bottom: 10px;">Welcome #{login.user}</h2>
+				<div style="display: flex; gap: 15px;">
+					<div style="position: relative; border-radius: 20px;  border: 1px solid black; width: fit-content; height: max-content; height: 100px; padding: 15px;">
+						<h4>Members</h4>	
+						<h5 style="position: absolute; right: 20px; bottom: 8px;"><h:outputText value="#{login.membersCount}" /></h5>				
+									
+					</div>
+					<div style="position: relative; border-radius: 20px;  border: 1px solid black; width: fit-content; height: max-content; height: 100px; padding: 15px;">
+						<h4>Activities</h4>	
+						<h5 style="position: absolute; right: 20px; bottom: 8px;"><h:outputText value="#{login.activitiesCount}" /></h5>				
+									
+					</div>
+				</div>
+				<h:commandLink style="margin-top: 10px;" action="#{login.logout}" value="Logout"></h:commandLink>			
+			</div>
+			</h:form>
+		</ui:define>
+	</ui:composition>
 </h:body>
 </html>

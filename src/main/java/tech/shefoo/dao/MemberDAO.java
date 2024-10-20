@@ -10,6 +10,7 @@ import java.util.List;
 
 import tech.shefoo.DatabaseConfig;
 import tech.shefoo.Member;
+import tech.shefoo.Skill;
 
 public class MemberDAO {
 
@@ -30,6 +31,7 @@ public class MemberDAO {
                 member.setAddress(resultSet.getString("address"));
                 member.setDate_of_birth(resultSet.getString("date_of_birth"));
                 member.setNewRecord(false);
+                member.setSkills(getMemberSkills(resultSet.getInt("id")));
                 members.add(member);
             }
         }
@@ -71,6 +73,7 @@ public class MemberDAO {
         String query = "CALL UpdateMember(?, ?, ?, ?, ?, ?, ?, ?);";
         try (Connection connection = DatabaseConfig.getDataSource().getConnection();
                 PreparedStatement statement = connection.prepareStatement(query)) {
+        		System.out.println(updatedMember.getName());
         	   statement.setInt(1, updatedMember.getId());
                statement.setString(2, updatedMember.getName());
                statement.setString(3, updatedMember.getNational_id());
@@ -78,7 +81,6 @@ public class MemberDAO {
                statement.setString(5, updatedMember.getEmail());
                statement.setString(6, updatedMember.getDate_of_birth());
                statement.setString(7, updatedMember.getAddress());
-               System.out.println(updatedMember.getProfileImg());
                statement.setString(8, updatedMember.getProfileImg());
                statement.executeUpdate();
        } catch (SQLException e) {
@@ -102,6 +104,8 @@ public class MemberDAO {
                     member.setEmail(resultSet.getString("email"));
                     member.setAddress(resultSet.getString("address"));
                     member.setDate_of_birth(resultSet.getString("date_of_birth"));
+                    member.setProfileImg("/uploads/" + resultSet.getString("image_path"));
+                    member.setSkills(getMemberSkills(resultSet.getInt("id")));
                 }
             }
         }
@@ -116,4 +120,38 @@ public class MemberDAO {
             statement.executeUpdate();
         }
     }
+    
+    
+    public List<Skill> getMemberSkills(int memberId) throws SQLException {
+    	String query = "CALL GetMemberSkills("+ memberId +");";
+    	List<Skill> skills = new ArrayList<>();
+    	
+        try (Connection connection = DatabaseConfig.getDataSource().getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            while (resultSet.next()) {
+                Skill skill = new Skill();
+                skill.setId(resultSet.getInt("id"));
+                skill.setName(resultSet.getString("name"));
+                skills.add(skill);
+            }
+        }
+        return skills;
+    }
+
+	public boolean isEmailExist(String email) {
+        String query = "SELECT COUNT(*) FROM members WHERE email = ?";
+        try (Connection connection = DatabaseConfig.getDataSource().getConnection();
+                PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, email);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+	}
 }

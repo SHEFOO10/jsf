@@ -13,6 +13,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import tech.shefoo.Activity;
 import tech.shefoo.DatabaseConfig;
 import tech.shefoo.Member;
+import tech.shefoo.Skill;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -37,6 +38,24 @@ public class ActivityDAO {
         
         // Return the number of years
         return period.getYears();
+    }
+    
+    public int activitiesCount() {
+    	String query = "CALL ActivitiesCount()";
+    	
+        try (Connection connection = databaseInstance.getConnection();
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(query)) {
+        			if (resultSet.next()) {
+        				System.out.println(resultSet.getInt(1));
+        				int count = resultSet.getInt(1);
+        				return count;
+        			}
+        	} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		return 0;
     }
     
     
@@ -78,6 +97,7 @@ public class ActivityDAO {
                 activity.setMin_age(resultSet.getInt("min_age"));
                 activity.setMax_age(resultSet.getInt("max_age"));                
                 activity.setNewRecord(false);
+                activity.setSkills(this.getActivitySkills(activity.getId()));
                 activities.add(activity);
             }
         }
@@ -116,6 +136,7 @@ public class ActivityDAO {
                 activity.setMin_age(resultSet.getInt("min_age"));
                 activity.setMax_age(resultSet.getInt("max_age"));
                 activity.setNewRecord(false);
+                activity.setSkills(this.getActivitySkills(activity.getId()));
                 availableActivities.add(activity);
             }
         }
@@ -146,6 +167,7 @@ public class ActivityDAO {
                 activity.setMin_age(resultSet.getInt("min_age"));
                 activity.setMax_age(resultSet.getInt("max_age"));      
                 activity.setNewRecord(false);
+                activity.setSkills(this.getActivitySkills(activity.getId()));
                 joinedActivities.add(activity);
             }
         }
@@ -255,4 +277,31 @@ public class ActivityDAO {
             statement.executeUpdate();
         }
     }
+
+
+	public List<Skill> getActivitySkills(int activityId) {
+		String query = "CALL GetActivitySkills(?)";
+		
+		List<Skill> activitySkills = new ArrayList<>();
+		try (Connection connection = databaseInstance.getConnection();
+				PreparedStatement statement = connection.prepareStatement(query)) {
+				statement.setInt(1, activityId);
+				
+				try (ResultSet result = statement.executeQuery()) {
+					while (result.next()) {
+		            	Skill skill = new Skill();
+		            	skill.setId(result.getInt("id"));
+		            	skill.setName(result.getString("name"));
+		            	activitySkills.add(skill);
+		            }
+				}
+				
+				
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return activitySkills;
+		
+	}
 }

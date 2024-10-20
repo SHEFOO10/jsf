@@ -7,6 +7,7 @@ import javax.faces.context.FacesContext;
 
 import tech.shefoo.Activity;
 import tech.shefoo.Member;
+import tech.shefoo.Skill;
 import tech.shefoo.dao.ActivityDAO;
 import tech.shefoo.dao.MemberDAO;
 
@@ -48,8 +49,10 @@ public class ActivityBean implements Serializable {
     private int memberId;
     private Member member;
     private boolean firstEntrance = true;
+	private List<Member> members;
+
     
-    
+   
     public void updateAvailableList() {
     	try {
 			setAvailableActivities(activityDAO.getAvialableActivites(memberId));
@@ -297,5 +300,16 @@ public FacesContext validate() {
         }
 		return context;
     }
+
+public List<Member> getMembers() {
+	try {
+		members = memberDAO.getAllMembers();
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	return members;
+}
+
 
 }

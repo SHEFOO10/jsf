@@ -1,274 +1,153 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
 <h:head>
-    <title>Member Activities</title>
-    <style>
-    	html, body, ol {
-    		padding: 0;
-    		margin: 0;
-    	}
-    
-         table {
-        	border-radius: 10px;
-            width: 100%;
-            border-collapse: collapse; /* Remove space between table cells */
-            height: max-content;
-            overflow-y: scroll;
-        }
-
-        th, td {
-            padding: 12px; /* Adds padding inside cells */
-            border: 1px solid #ddd; /* Adds border to each cell */
-            text-align: center; /* Aligns text to the center */
-        }
-
-        th {
-            background-color: #f2f2f2; /* Adds background color to table headers */
-            font-weight: bold; /* Makes header text bold */
-            position: sticky;
-            top: -1px;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f9f9f9; /* Zebra striping: changes background of even rows */
-        }
-
-        tr:hover {
-            background-color: #e9e9e9; /* Hover effect for rows */
-        }
-
-        caption {
-            font-size: 1.5em; /* Styles caption (title) of table */
-            margin: 10px 0;
-        }
-        
-        .popup-container {
-		  width: 400px;
-		  height: 250px;
-		  border: 1px dashed black;
-		  border-radius: 20px;
-		  text-align: center;
-		  
-		  display: flex;
-		  flex-flow: column;
-		  flex-wrap: nowrap;
-		  justify-content: center;
-		  position: fixed;
-		  top: 50%;
-		  left: 50%;
-		  transform: translate(-50%, -50%);
- 		  background-color: rgba(255, 255, 255, 0.4);
-		  backdrop-filter: blur(5px);
-		}
-		
-		#errorForm\:closePopup {
-		  border: none;
-		  position: absolute;
-		  right: 3%;
-		  top: 5%;
-		  border-radius: 10px;
-		  padding: 7px 12px;
-		  font-weight: bold;
-		  cursor: pointer;
-
-		}
-		
-		.popup-container > h3:first-of-type {
-		  position: absolute;
-		  left: 5%;
-		  top: 1%;
-		}
-		
-		.okBtn {
-		    position: absolute;
-   			padding: 10px 20px;
-		    margin-inline: auto;
-		    text-align: center;
-		    left: 44%;
-		    bottom: 10%;
-		    border-radius: 10px;
-		    border: 1px solid black;
-		    cursor: pointer;
-   		}
-   		
-   		#flexContainer {
-   			display: flex;
-   			flex-wrap: wrap;
-   			gap: 10px;
-   		}
-
-   		nav {
-   			width: 100%;
-   			height: 60px;
-   			background-color: #fafafa;
-   			display: flex;
-   			flex-wrap: nowrap;
-   			align-items: center;
-   			justify-content: center;
-   		}
-   		
-		ol {
-			width: 400px;
-   			text-align: center;
-   		}
-   		
-
-   		li {
-   			display: inline;
-   			margin-inline: 5%;
-   		}
-
-		li a {
-			cursor: click;
-			font-weight: bold;
-			color: black;
-			text-decoration: none;
-		}
-		
-		li a:hover {
-			color: red;
-		}
-
-		
-		#j_idt13\:memberId {
-			margin-inline: 10px;
-			border-radius: 5px;
-		}
-		
-		.flexItem {
-			flex-basis: 49%;
-			flex-grow: 1;
-			flex-shrink: 0;
-		}
-		
-		.flexItem:first-child {
-			flex-basis: 100%;
-		}
-		
-		.active {
-			color: blue;
-		}
-		
-    </style>
+	<title>Member Activities</title>
 </h:head>
 <h:body>
-<ui:include src="/WEB-INF/includes/nav.xhtml" />
-<h:form id="errorForm">
-    <h:panelGroup id="popup" rendered="#{activityBean.showErrorPopup}">
-        <h:panelGroup layout="block" styleClass="popup-container">
-        	<h3>
-	            <h:outputText value="Error Message" />
-        	</h3>
-        	<h3>
-	            <h:outputText value="#{activityBean.errorMessage}" />
-        	</h3>
-            <h:commandButton id="closePopup" value="X" action="#{activityBean.closePopup}">
-                <f:ajax execute="@this" render="@form" />
-            </h:commandButton>
-            
-            <h:commandButton value="Ok" action="#{activityBean.closePopup}" styleClass="okBtn">
-                <f:ajax execute="@this" render="@form" />
-            </h:commandButton>
-        </h:panelGroup>
-    </h:panelGroup>
-</h:form>
+	<ui:composition template="/WEB-INF/includes/layouts/layout.xhtml">
+		<ui:define name="content">
 
 
-
-    <h:form>
-        <div style="text-align: center; margin-block: 20px">
-            <h:outputLabel for="memberId" value="Member ID:" />
-            <h:inputText id="memberId" value="#{activityBean.memberId}" />
-            <h:commandButton value="Search" action="#{activityBean.searchActivities}" />
-			<p><h:message for="memberId" style="color: blue;" /></p>
-        </div>
-        
-        
-        <h:panelGroup rendered="#{empty activityBean.member and !activityBean.firstEntrance}" style="text-align: center;">
-			<h1 style="text-align: center;">No Member found</h1>
-        </h:panelGroup>
-		<div id="flexContainer">
-		
-			<div class="flexItem">
-				<h:panelGroup rendered="${not empty activityBean.member}" style="display:flex; flex-wrap: wrap; padding-inline: 30%; height: 150px; justify-content: space-evenly">
-					<div>
-						<h:outputLabel>Member Name: </h:outputLabel>
-						<h:outputText value="#{activityBean.member.name}" />
-					</div>
-					<div>
-					<h:outputLabel>email: </h:outputLabel>
-					<h:outputText value="#{activityBean.member.email}" />
-					</div>
-										<div>
-					<h:outputLabel>National id: </h:outputLabel>
-					<h:outputText value="#{activityBean.member.national_id}" />
-					</div>
-										<div>
-					<h:outputLabel>Phone: </h:outputLabel>
-					<h:outputText value="#{activityBean.member.phone}" />
-					</div>
-					<div>
-					<h:outputLabel>Date Of Birth: </h:outputLabel>
-					<h:outputText value="#{activityBean.member.date_of_birth}" />
-					</div>
-					
+		<div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%)">
+			<h:form id="errorForm" >
+				<h:panelGroup id="popup" rendered="#{activityBean.showErrorPopup}">
+					<h:panelGroup layout="block" styleClass="popup-container" class="d-flex" style="position: relative; background-color: #97d3db; border-radius: 20px; height: 300px; padding: 35px; flex-direction: column; gap: 20px; justify-content: center;">
+						<h:commandButton id="closePopup" value="X" action="#{activityBean.closePopup}" class="btn btn-danger mx-2" style="width: 40px; position: absolute; right: 20px; top: 20px;">
+							<f:ajax execute="@this" render="@form" />
+						</h:commandButton>
+						<h3>
+							<h:outputText value="Error Message" />
+						</h3>
+						<h3>
+							<h:outputText value="#{activityBean.errorMessage}" />
+						</h3>
+						
+						<div class="d-flex justify-content-end">
+							<h:commandButton value="Ok" action="#{activityBean.closePopup}" styleClass="okBtn" class="btn btn-primary mx-2" style="width: 100px;">
+								<f:ajax execute="@this" render="@form" />
+							</h:commandButton>
+						</div>
+					</h:panelGroup>
 				</h:panelGroup>
-			
-			</div>
-	        <h:panelGroup rendered="#{not empty activityBean.availableActivities}">
-	        	<div class="flexItem">
-	        	<h:outputText value="Available Activities" style="font-weight: bold;" />
-	            <h:dataTable value="#{activityBean.availableActivities}" var="activity">
-	                <h:column>
-	                    <f:facet name="header">id</f:facet>
-	                    <h:outputText value="#{activity.id}" />
-	                </h:column>
-	                <h:column>
-	                    <f:facet name="header">Name</f:facet>
-	                    <h:outputText value="#{activity.name}" />
-	                </h:column>
-	                <h:column>
-	                    <f:facet name="header">description</f:facet>
-	                    <h:outputText value="#{activity.description}" />
-	                </h:column>
-	                 <h:column>
-	                    <!-- Edit Member Button -->
-	                    <h:commandButton value="Join" action="#{activityBean.joinActivity(activity.id)}"/>
-	
-	                </h:column>
-	            </h:dataTable>
-	        	</div>
-	        </h:panelGroup>
-	        <h:panelGroup rendered="#{not empty activityBean.joinedActivities}">
-	        	<div class="flexItem">
-	        	<h:outputText value="Joined Activities" style="font-weight: bold;" />
-	            <h:dataTable value="#{activityBean.joinedActivities}" var="activity">
-        	        <h:column>
-	                    <f:facet name="header">id</f:facet>
-	                    <h:outputText value="#{activity.id}" />
-	                </h:column>
-	                <h:column>
-	                    <f:facet name="header">Name</f:facet>
-	                    <h:outputText value="#{activity.name}" />
-	                </h:column>
-	                <h:column>
-	                    <f:facet name="header">description</f:facet>
-	                    <h:outputText value="#{activity.description}" />
-	                </h:column>
-	                 <h:column>
-	                    <!-- Edit Member Button -->
-	                    <h:commandButton value="Leave" action="#{activityBean.leaveActivity(activity.id)}"/>
-	
-	                </h:column>
-	            </h:dataTable>
-	        	</div>
-	        </h:panelGroup>
+			</h:form>
 		</div>
 
-    </h:form>
+
+
+			<h:form>
+				<div style="text-align: center; margin-block: 20px">
+					<div class="form-group" style="display: flex; justify-content: center; align-items: center; gap: 10px;">
+						<h:outputLabel for="memberId" value="Member : " style="font-weight: bold;" />
+						<h:selectOneMenu id="memberId" value="#{activityBean.memberId}" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc;">
+							<f:selectItems value="#{activityBean.members}" var="member" itemValue="#{member.id}" itemLabel="#{member.name}" />
+						</h:selectOneMenu>
+						<h:commandButton value="Search" action="#{activityBean.searchActivities}" class="btn btn-primary" style="padding: 5px 10px; border-radius: 5px;" />
+					</div>
+					<p>
+						<h:message for="memberId" style="color: blue;" />
+					</p>
+				</div>
+				<div id="d-flex justify-content-center">
+
+					<h:panelGroup rendered="${not empty activityBean.member}" class="d-flex justify-content-center mb-3"
+						style="height: 300px; gap: 50px">
+
+						<div style="display:flex; flex-direction: column; justify-content: space-evenly; height: 100%;">
+							<div>
+								<h:outputLabel>Member Name: </h:outputLabel>
+								<h:outputText value="#{activityBean.member.name}" />
+							</div>
+							<div>
+								<h:outputLabel>email: </h:outputLabel>
+								<h:outputText value="#{activityBean.member.email}" />
+							</div>
+							<div>
+								<h:outputLabel>National id: </h:outputLabel>
+								<h:outputText value="#{activityBean.member.national_id}" />
+							</div>
+							<div>
+								<h:outputLabel>Phone: </h:outputLabel>
+								<h:outputText value="#{activityBean.member.phone}" />
+							</div>
+							<div>
+								<h:outputLabel>Date Of Birth: </h:outputLabel>
+								<h:outputText value="#{activityBean.member.date_of_birth}" />
+							</div>
+							<div>
+								<h:outputLabel>Skills:
+									<h:outputText value="#{activityBean.member.getSkillsAsString()}"
+										rendered="#{activityBean.member.skills.size() > 0}" />
+									<h:outputText value="No Skills "
+										rendered="#{activityBean.member.skills.size() == 0}" />
+								</h:outputLabel>
+							</div>
+						</div>
+						<div>
+							<img src="#{resource[activityBean.member.profileImg]}" width="100%" height="100%"
+								style="border-radius: 10px;" />
+						</div>
+					</h:panelGroup>
+					<div class="d-flex" style="gap: 20px; margin-inline: 20px;">
+						<h:panelGroup rendered="#{not empty activityBean.availableActivities}">
+							<div class="flexItem">
+								<h:outputText value="Available Activities" style="font-weight: bold;" />
+								<h:dataTable class="table align-middle mb-0 bg-white"
+									value="#{activityBean.availableActivities}" var="activity">
+									<h:column>
+										<f:facet name="header">Name</f:facet>
+										<h:outputText value="#{activity.name}" />
+									</h:column>
+									<h:column>
+										<f:facet name="header">Description</f:facet>
+										<h:outputText value="#{activity.description}" />
+									</h:column>
+									<h:column>
+										<f:facet name="header">Required Skills</f:facet>
+										<h:outputText value="#{activity.getSkillsAsString()}"
+											rendered="#{activity.skills.size() > 0}" />
+										<h:outputText value="No Skills Required"
+											rendered="#{activity.skills.size() == 0}" />
+									</h:column>
+									<h:column>
+										<!-- Edit Member Button -->
+										<h:commandButton class="btn btn-primary" value="Join"
+											action="#{activityBean.joinActivity(activity.id)}" />
+
+									</h:column>
+
+								</h:dataTable>
+							</div>
+						</h:panelGroup>
+						<h:panelGroup rendered="#{not empty activityBean.joinedActivities}">
+							<div class="flexItem">
+								<h:outputText value="Joined Activities" style="font-weight: bold;" />
+								<h:dataTable value="#{activityBean.joinedActivities}" var="activity" class="table align-middle">
+									<h:column>
+										<f:facet name="header">Name</f:facet>
+										<h:outputText value="#{activity.name}" />
+									</h:column>
+									<h:column>
+										<f:facet name="header">description</f:facet>
+										<h:outputText value="#{activity.description}" />
+									</h:column>
+									<h:column>
+										<!-- Edit Member Button -->
+										<h:commandButton class="btn btn-danger" value="Leave"
+											action="#{activityBean.leaveActivity(activity.id)}" />
+
+									</h:column>
+								</h:dataTable>
+							</div>
+						</h:panelGroup>
+					</div>
+				</div>
+
+			</h:form>
+		</ui:define>
+	</ui:composition>
+
 </h:body>
+
 </html>

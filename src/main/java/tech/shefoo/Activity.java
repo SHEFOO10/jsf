@@ -1,7 +1,11 @@
 
 package tech.shefoo;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 
@@ -13,7 +17,16 @@ public class Activity implements Cloneable {
     private String description;
     private Integer min_age;
     private Integer max_age;
-    private boolean isNewRecord = true;
+    private List<Skill> skills = new ArrayList<>();
+
+	public String getSkillsAsString() {
+        return skills.stream()
+        		.map(Skill::getName)
+        		.collect(Collectors.joining(", "));
+	}
+
+
+	private boolean isNewRecord = true;
 
 	private Map<String, String> props;
     
@@ -105,5 +118,13 @@ public class Activity implements Cloneable {
 
 	public void setNewRecord(boolean isNewRecord) {
 		this.isNewRecord = isNewRecord;
+	}
+
+	public List<Skill> getSkills() {
+		return skills;
+	}
+
+	public void setSkills(List<Skill> skills) {
+		this.skills = skills;
 	}
 }

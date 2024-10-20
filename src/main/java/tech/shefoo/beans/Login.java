@@ -8,6 +8,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpSession;
+
+import tech.shefoo.dao.ActivityDAO;
 import tech.shefoo.dao.LoginDAO;
 import tech.shefoo.dao.MemberDAO;
 
@@ -21,13 +23,24 @@ public class Login implements Serializable {
 	private String msg;
 	private String user;
 	private long membersCount;
+	private long activitiesCount;
 
     
-    private MemberDAO memberdoa = new MemberDAO();
+    public long getActivitiesCount() {
+		return activitiesCount;
+	}
 
+	public void setActivitiesCount(long activitiesCount) {
+		this.activitiesCount = activitiesCount;
+	}
+
+	private MemberDAO memberdoa = new MemberDAO();
+	private ActivityDAO activitydoa = new ActivityDAO();
+	
 	@PostConstruct
 	public void init() {
 		setMembersCount(memberdoa.membersCount());
+		setActivitiesCount(activitydoa.activitiesCount());
 	}
 
 	public String getPwd() {

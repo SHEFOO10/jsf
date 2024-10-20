@@ -1,51 +1,59 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">  
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui">
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui">
 <head>
     <meta charset="UTF-8" />
     <title>Skills Management</title>
     <link rel="stylesheet" href="#{resource['css/skills.css']}" />
 </head>
 <body>
-<h1>Skills Management</h1>
-            <ui:repeat var="skill" value="#{skillBean.skills}">
-            	<p>skill Name : #{skill.name}</p>
-            </ui:repeat>
-    <h:form id="createSkillForm">
-        <section>
-            <h2>Create New Skill</h2>
-            <h:outputLabel for="skillName" value="Skill Name:" />
-            <h:inputText id="skillName" value="#{skillBean.newSkillName}" />
-            <h:commandButton value="Create Skill" action="#{skillBean.createSkill}" />
-        </section>
-    </h:form>
+<ui:composition template="/WEB-INF/includes/layouts/layout.xhtml">
 
-    <h:form id="addSkillToActivityForm">
-        <section>
-            <h:outputLabel for="skillSelect" value="Select Skill:" />
+<ui:define name="content">
+	<h3 class="text-center">Skills Management</h3>
 
-            <h:selectOneMenu id="skillSelect" value="#{skillBean.selectedSkill}">
-                <f:selectItems value="#{skillBean.skills}" var="skill" itemValue="#{skill.id}" itemLabel="#{skill.name}" />
-            </h:selectOneMenu>
-            <h:commandButton value="Add Skill" action="#{skillBean.addSkillToActivity}" />
-        </section>
-    </h:form>
+    <h:form>
+        <div class="form-group" style="width: 30%; margin: auto;">
+            <label for="newSkill">New Skill:</label>
+            <h:inputText id="newSkill" value="#{skillBean.newSkillName}" styleClass="form-control mb-4" />
+            <h:commandButton value="Add Skill" action="#{skillBean.createSkill}" styleClass="btn btn-primary" />
+        </div>
 
-    <h:form id="assignSkillToMemberForm">
-        <section>
-            <h2>Assign Skill to Member</h2>
-            <h:outputLabel for="memberName" value="Member Name:" />
-            <h:inputText id="memberName" value="#{skillBean.memberName}" />
-            <h:outputLabel for="skillAssignSelect" value="Select Skill:" />
-            <h:selectOneMenu id="skillAssignSelect" value="#{skillBean.selectedSkillForMember}">
-                <f:selectItems value="#{skillBean.skills}" var="skill" itemValue="#{skill.id}" itemLabel="#{skill.name}" />
-            </h:selectOneMenu>
-            <h:commandButton value="Assign Skill" action="#{skillBean.assignSkillToMember}" />
-        </section>
-    </h:form>
+    <div class="form-group mt-4" style="width: 30%; margin: auto;">
+        <label for="activitySelect">Select Activity:</label>
+        <h:selectOneMenu id="activitySelect" value="#{skillBean.selectedActivityId}" styleClass="form-control mb-4">
+            <f:selectItems value="#{activityBean.activities}" var="activity" itemValue="#{activity.id}" itemLabel="#{activity.name}" />
+        </h:selectOneMenu>
+    </div>
+
+    <div class="form-group" style="width: 30%; margin: auto;">
+        <label for="memberSelect">Select Member:</label>
+        <h:selectOneMenu id="memberSelect" value="#{skillBean.selectedMemberId}" styleClass="form-control mb-4">
+            <f:selectItems value="#{memberBean.members}" var="member" itemValue="#{member.id}" itemLabel="#{member.name}" />
+        </h:selectOneMenu>
+    </div>
+
+    <div class="form-group" style="width: 30%; margin: auto;">
+        <label for="skillsSelect">Select Skills:</label>
+        <h:selectManyListbox id="skillsSelect" value="#{skillBean.selectedSkills}" size="5" styleClass="form-control mb-4">
+            <f:selectItems value="#{skillBean.skills}" var="skill" itemValue="#{skill.id}" itemLabel="#{skill.name}" />
+        </h:selectManyListbox>
+    </div>
+
+    <div class="form-group text-center" style="width: 30%; margin: auto;">
+        <h:commandButton value="Add Skills to Activity" action="#{skillBean.addSkillsToActivity()}" styleClass="btn btn-success mb-2 mx-2" />
+        <h:commandButton value="Add Skills to Member" action="#{skillBean.addSkillsToMember()}" styleClass="btn btn-info mb-2 mx-2" />
+    </div>
+</h:form>
+</ui:define>
+</ui:composition>
+
+
+
+    
 
 </body>
 </html>

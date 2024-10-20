@@ -5,12 +5,14 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.validator.Validator;
 import javax.servlet.ServletContext;
 
 import org.primefaces.model.file.UploadedFile;
 
 import tech.shefoo.Member;
 import tech.shefoo.dao.MemberDAO;
+import tech.shefoo.validator.EmailValidator;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,39 +23,35 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-
-
 @ManagedBean
 @ViewScoped
 public class MemberBean {
 
-	private List<Member> members;
+    private List<Member> members;
     private MemberDAO memberDAO = new MemberDAO();
     private Member newMember = new Member();
     private Member selectedMember;
 
     private String uploadPath;
-	private UploadedFile file;
-	
+    private UploadedFile file;
+
     private String generateRandomFilename(String originalFileName) {
-    	if (originalFileName == null) return null;
+        if (originalFileName == null)
+            return null;
         String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
         String randomUUID = UUID.randomUUID().toString();
         return randomUUID + fileExtension; // Append the original file extension
     }
-    
-    
-    
-    
+
     @PostConstruct
     public void init() {
         // Get the FacesContext and then the ServletContext
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ServletContext servletContext = (ServletContext) facesContext.getExternalContext().getContext();
-        
+
         // Get the real path for the uploads directory
         uploadPath = servletContext.getRealPath("/resources/uploads");
-        
+
         // Create the uploads directory if it doesn't exist
         try {
             Path path = Paths.get(uploadPath);
@@ -64,24 +62,23 @@ public class MemberBean {
             e.printStackTrace();
         }
     }
-    
+
     public UploadedFile getFile() {
-		return file;
-	}
+        return file;
+    }
 
+    public void setFile(UploadedFile file) {
+        this.file = file;
+    }
 
-	public void setFile(UploadedFile file) {
-		this.file = file;
-	}
-
-
-	public String uploadProfileImg(UploadedFile file) {
-		String randomImgName = null;
+    public String uploadProfileImg(UploadedFile file) {
+        String randomImgName = null;
         if (file != null) {
             try (InputStream input = file.getInputStream()) {
                 // Save the uploaded file to the uploads directory
-            	randomImgName = generateRandomFilename(file.getFileName());
-            	if (randomImgName == null) return "placeholder.jpg";
+                randomImgName = generateRandomFilename(file.getFileName());
+                if (randomImgName == null)
+                    return "placeholder.jpg";
                 Path filePath = Paths.get(uploadPath, randomImgName);
                 Files.copy(input, filePath);
                 System.out.println("File successfully uploaded: " + filePath);
@@ -89,14 +86,14 @@ public class MemberBean {
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-            	setFile(null);
+                setFile(null);
             }
         } else {
             System.out.println("No file selected!");
         }
         return "placeholder.jpg";
     }
-    
+
     public void loadMembers() {
         try {
             members = memberDAO.getAllMembers();
@@ -121,14 +118,14 @@ public class MemberBean {
         this.newMember = Member;
     }
 
-     public void addMember() {
+    public void addMember() {
         validate();
         if (FacesContext.getCurrentInstance().getMessageList().isEmpty()) {
 
-        	String image_path = uploadProfileImg(file);
-        	
+            String image_path = uploadProfileImg(file);
+
             newMember.setProfileImg(image_path);
-        	try {
+            try {
                 if (newMember.getId() == 0) {
                     memberDAO.addMember(newMember);
                 } else {
@@ -137,7 +134,8 @@ public class MemberBean {
                 newMember = new Member(); // Reset the form
                 loadMembers(); // Refresh the list
             } catch (SQLException e) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Database Error", "An error occurred while accessing the database."));
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Database Error", "An error occurred while accessing the database."));
                 e.printStackTrace();
             }
         }
@@ -147,18 +145,17 @@ public class MemberBean {
         // Find the member by ID and populate `newMember` for editing
         for (Member member : members) {
             if (member.getId() == id) {
-            	try {
-					setNewMember((Member) member.clone());
-				} catch (CloneNotSupportedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-            	setSelectedMember(member);
+                try {
+                    setNewMember((Member) member.clone());
+                } catch (CloneNotSupportedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                setSelectedMember(member);
                 break;
             }
         }
     }
-   
 
     public void deleteMember(int memberId) {
         try {
@@ -171,9 +168,9 @@ public class MemberBean {
     }
 
     public void resetInputs() {
-    	newMember = new Member(); // Reset the form   
+        newMember = new Member(); // Reset the form
     }
-    
+
     public Member getSelectedMember() {
         return selectedMember;
     }
@@ -181,6 +178,18 @@ public class MemberBean {
     public void setSelectedMember(Member selectedMember) {
         this.selectedMember = selectedMember;
     }
+
+    private Validator emailValidator = new EmailValidator();
+
+    public Validator getEmailValidator() {
+        return emailValidator;
+    }
+
+    public void setEmailValidator(Validator emailValidator) {
+        this.emailValidator = emailValidator;
+    }
+
+    
     public void validate() {
         FacesContext context = FacesContext.getCurrentInstance();
     
@@ -208,4 +217,5 @@ public class MemberBean {
             context.addMessage("memberForm:address", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Validation Error", "Address is required."));
         }
     }
+
 }

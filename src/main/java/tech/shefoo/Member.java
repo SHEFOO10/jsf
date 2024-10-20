@@ -1,7 +1,12 @@
 
 package tech.shefoo;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import tech.shefoo.dao.SkillDAO;
 
 public class Member implements Cloneable {
     private int id;
@@ -13,8 +18,16 @@ public class Member implements Cloneable {
     private String date_of_birth;
     private String address;
     private String profileImg;
+    private List<Skill> skills = new ArrayList<>();
     
-    public String getProfileImg() {
+	public String getSkillsAsString() {
+		System.out.println(skills.size());
+        return skills.stream()
+        		.map(Skill::getName)
+        		.collect(Collectors.joining(", "));
+	}
+
+	public String getProfileImg() {
 		return profileImg;
 	}
 
@@ -137,5 +150,13 @@ public class Member implements Cloneable {
 
 	public void setNewRecord(boolean isNewRecord) {
 		this.isNewRecord = isNewRecord;
+	}
+
+	public List<Skill> getSkills() {
+		return skills;
+	}
+
+	public void setSkills(List<Skill> skills) {
+		this.skills = skills;
 	}
 }

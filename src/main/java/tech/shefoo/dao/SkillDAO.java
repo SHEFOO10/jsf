@@ -18,7 +18,6 @@ public class SkillDAO {
     private HikariDataSource databaseInstance = DatabaseConfig.getDataSource();
 
 	public List<Skill> getAllSkills() throws SQLException {
-		System.out.println("getting all the skills");
         List<Skill> skills = new ArrayList<>();
         String query = "CALL GetAllSkills();";
         try (Connection connection = databaseInstance.getConnection();
@@ -42,7 +41,33 @@ public class SkillDAO {
             preparedStatement.executeUpdate();
         }
     }
-
-
-
+    
+    public void addSkillToActivity(int activiyId, int skillId) {
+    	String query = "CALL AddActivitySkill(?, ?);";
+    	
+    	try (Connection connection = databaseInstance.getConnection();
+    			PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+    		preparedStatement.setInt(1, activiyId);
+    		preparedStatement.setInt(2, skillId);
+    		preparedStatement.executeUpdate();
+    	} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
+    public void addSkillToMember(int memberId, int skillId) {
+    	
+    	String query = "CALL AddMemberSkill(?, ?);";
+    	
+    	try (Connection connection = databaseInstance.getConnection();
+    			PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+    		preparedStatement.setInt(1, memberId);
+    		preparedStatement.setInt(2, skillId);
+    		preparedStatement.executeUpdate();
+    	} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
 }
